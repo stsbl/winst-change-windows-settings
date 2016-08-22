@@ -1,0 +1,16 @@
+Source: winst-change-windows-settings
+Section: unknown
+Priority: optional
+Maintainer: Stadtteilschule Blankenese <repository@stsbl.de>
+Build-Depends: debhelper (>=9)
+Standards-Version: 3.9.6
+
+Package: winst-change-windows-settings
+Architecture: all
+Description: winst Windows: Einstellungen ändern
+ Dieses Paket integriert sich in die IServ Softwareverteilung und kann auf Windows-Computer angewandt werden,
+ um Systemeinstellungen, wie die Benutzerkontensteuerung und die Firewall zu konfigurieren.
+ Eine detaillierte Dokumentation aller Einstellungen befindet sich unter
+ https://repository.stsbl.de/doc/tools/winst-change-windows-settings.html.
+Tag: suite::iserv:deploy, role::package
+ 

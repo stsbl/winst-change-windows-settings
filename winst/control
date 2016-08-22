@@ -1,0 +1,156 @@
+[Product]
+type: localboot
+id: change-windows-settings
+name: Windows: Einstellungen ändern
+description: Dieses Paket kann auf Windows-Computer angewandt werden, um Systemeinstellungen, wie die Benutzerkontensteuerung und die Firewall zu konfigurieren. Eine detaillierte Dokumentation aller Einstellungen befindet sich unter https://repository.stsbl.de/doc/tools/winst-change-windows-settings.html
+advice: Nachdem die Einstellungen auf Windows-Computer angewandt wurden, das Paket aber nicht mehr in der Liste der installierten Software erscheinen soll, kann es einfach durch Ignorieren entfernt werden. Die Option zum Löschen der Benutzerprofile darf nur von Bildungs- und Non-Profit-Organisationen eingesetzt werden.
+version: 0.3
+packageVersion: 2.9
+priority: 0
+setupScript: install.ins
+uninstallScript: remove.ins
+
+[ProductProperty]
+type: unicode
+name: uac
+description: Die Benutzerkontensteuerung aktivieren?
+editable: False
+values: ["Ja", "Nein", "Unverändert"]
+default: ["Unverändert"]
+
+[ProductProperty]
+type: unicode
+name: uac-level
+description: Level der Benutzerkontensteuerung für Administratoren
+editable: False
+values: ["0", "1", "2", "3"]
+default: ["0"]
+
+[ProductProperty]
+type: bool
+name: uac-user
+description: Können Benutzer die UAC verwenden?
+editable: False
+default: True
+
+[ProductProperty]
+type: unicode
+name: firewall
+description: Die Firewall aktivieren?
+editable: False
+values: ["Ja", "Nein", "Unverändert"]
+default: ["Unverändert"]
+
+[ProductProperty]
+type: bool
+name: file-printer-sharing
+description: Ausnahmeregeln für IServ hinzufügen?
+editable: False
+default: True
+
+[ProductProperty]
+type: unicode
+name: file-printer-sharing-local-ip
+description: Lokale IP-Adressen für Ausnahmeregeln
+editable: True
+
+[ProductProperty]
+type: unicode
+name: file-printer-sharing-remote-ip
+description: Remote IP-Adressen für Ausnahmeregeln
+editable: True
+
+[ProductProperty]
+type: unicode
+name: active-energy-scheme
+editable: False
+values: ["Energiesparmodus", "Ausbalanciert", "Höchstleistung"]
+default: ["Ausbalanciert"]
+description: Aktiver Energiesparplan
+
+[ProductProperty]
+type: bool
+name: lock-energy-settings
+editable: False
+default: False
+description: Ändern der Energieoptionen sperren?
+
+[ProductProperty]
+type: unicode
+name: systemsid-action
+description: Aktion bei Zuklappen des Deckels
+editable: False
+values: ["Unverändert", "Nichts unternehmen", "Standby", "Ruhezustand", "Herunterfahren"]
+default: ["Unverändert"]
+
+[ProductProperty]
+type: bool
+name: password-on-resume
+description: Passwort beim Aufwecken des Computers anfordern?
+editable: false
+default: true
+
+[ProductProperty]
+type: unicode
+name: powerbutton-action
+description: Aktion beim Drücken des Netzschalters
+values: ["Unverändert", "Nichts unternehmen", "Standby", "Ruhezustand", "Herunterfahren"]
+default: ["Unverändert"]
+editable: false
+
+[ProductProperty]
+type: bool
+name: disable-sleep-functions
+description: Sämtliche Energiesparfunktionen deaktivieren?
+editable: False
+default: False
+
+[ProductProperty]
+type: bool
+name: default-local-printer
+description: Einen lokalen Drucker als Standard einrichten?
+editable: false
+default: false
+
+[ProductProperty]
+type: unicode
+name: local-printer-name
+description: Name des lokalen Druckers
+
+[ProductProperty]
+type: bool
+name: cleanup-profiles
+description: Alle zwischengespeicherten Roamingprofile auf dem Computer löschen?
+editable: False
+default: False
+
+[ProductProperty]
+type: unicode
+name: excluded-profiles
+description: Folgende Profile ausschließen
+
+[ProductProperty]
+type: unicode
+name: fix-edge-localhost
+description: Microsoft Edge den Zugriff auf localhost gestatten
+values: ["Ja", "Nein", "Unverändert"]
+default: ["Unverändert"]
+editable: false
+
+[ProductProperty]
+type: unicode
+name: disable-wu-agent
+description: Windows-Update-Dienst deaktivieren
+values: ["Ja", "Nein", "Unverändert"]
+default: ["Unverändert"]
+editable: false
+
+[ProductProperty]
+type: bool
+name: disable-automatic-updates
+description: Automatische Windows Updates unterbinden?
+default: false
+editable: false
+
+
+

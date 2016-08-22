@@ -1,0 +1,11 @@
+[Sub_RemoveLocalPrinter]
+LinkFolder_RemovePrinterShortcut
+Files_DeletePrintereBatch
+
+[LinkFolder_RemovePrinterShortcut]
+set_basefolder common_startup
+set_subfolder ""
+delete_element "Local Printer"
+
+[Files_DeleteBatch]
+delete -sf "%ProgramFilesSysnativeDir%\stsbl"

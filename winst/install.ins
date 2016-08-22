@@ -1,0 +1,658 @@
+[Initial]
+message "Initalisiere angeforderte Aktionen..."
+encoding=UTF-8
+DefVar $ExitCode$
+
+include_append "uninstall.inc.ins"
+
+[Actions]
+ShowBitmap "%ScriptPath%\logo.png" "Windows-Einstellungen"
+if (CompareDotSeparatedNumbers(GetMsVersionInfo, "<", "6.1"))
+  LogError "change-windows-settings requires at least Windows 7!"
+  isFatalError
+endif
+Sub_DefVars
+Sub_GetUACProperties
+Sub_UAC
+Sub_UACLevel
+Sub_UACUser
+Sub_GetFirewallProperties
+Sub_Firewall
+Sub_GetUserProfileProperties
+Sub_UserProfiles
+Sub_GetPowercfgProperties
+Sub_Powercfg
+Sub_GetSystemSIDproperties
+Sub_SystemSID
+Sub_GetPasswordOnResumeProperties
+Sub_PasswordOnResume
+Sub_GetPowerButtonProperties
+Sub_PowerButton
+Sub_GetPrinterProperties
+Sub_Printer
+Sub_GetSleepProperties
+Sub_Sleep
+if (CompareDotSeparatedNumbers(GetMsVersionInfo, ">=", "10.0"))
+  Sub_GetFixEdgeProperties
+  Sub_FixEdge_localhost
+endif
+Sub_GetWUProperties
+Sub_SetWUStatus
+Sub_GetAUUpdateProperties
+Sub_SetAUStatus
+Sub_WinReboot
+
+[Sub_GetAUUpdateProperties]
+message "Rufe Einstellungen für automatisches Windows Update ab..."
+comment "Get properties for Auto Updates from service"
+Set $DisableAUUpdate$ = GetProductProperty("disable-automatic-updates", "false")
+
+[Sub_SetAUStatus]
+if ($DisableAUUpdate$ = "true")
+  message "Deaktiviere automatische Updates..."
+  Registry_DisableAUUpdate
+endif
+
+if ($DisableAUUpdate$ = "false")
+  message "Setzte automatische Updates zurück..."
+  Registry_ResetAUUpdate
+endif
+
+message "Aktualisiere Gruppenrichtlinien..."
+DosInAnIcon_PolicyUpdate
+
+[Registry_DisableAUUpdate]
+openkey [HKEY_LOCAL_MACHINE\Software\Policies\Microsoft\Windows\WindowsUpdate\AU]
+set "NoAutoUpdate" = REG_DWORD:1
+
+[Registry_ResetAUUpdate]
+openkey [HKEY_LOCAL_MACHINE\Software\Policies\Microsoft\Windows\WindowsUpdate\AU]
+deletevar "NoAutoUpdate"
+
+[Sub_GetWUProperties]
+message "Rufe Einstellungen für Windows Update ab ..."
+comment "Getting properties for Windows Update from service"
+Set $DisableAgent$ = GetProductProperty("disable-wu-agent", "Unverändert")
+
+[Sub_SetWUStatus]
+if ($DisableAgent$ = "Ja")
+  DosInAnIcon_DisableWUAgent
+  Sub_HandleExitCode
+endif
+if ($DisableAgent$ = "Nein")
+  DosInAnIcon_EnableWUAgent
+  Sub_HandleExitCode
+endif
+
+[DosInAnIcon_DisableWUAgent]
+@echo off
+sc config wuauserv start= disabled
+
+[DosInAnIcon_EnableWUAgent]
+@echo off
+sc config wuauserv start= auto
+
+[Sub_GetFixEdgeProperties]
+message "Rufe Einstellungen für Microsoft Edge ab..."
+comment "Getting properties for Microsoft Edge from service..."
+Set $FixEdgeLocalhost$ = GetProductProperty("fix-edge-localhost", "Unverändert")
+
+[Sub_FixEdge_localhost]
+message "Stelle Zugriff von Edge auf localhost ein..."
+if ($FixEdgeLocalhost$ = "Ja")
+  comment "Allowing access to localhost for Microsoft Edge..."
+  DosInAnIcon_EdgeFixLocalhost_Enable
+  Sub_HandleExitCode
+endif
+
+
+if ($FixEdgeLocalhost$ = "Nein")
+  comment "Disabling access to localhost for Microsoft Edge..."
+  DosInAnICon_EdgeFixLocalhost_Disable
+  Sub_HandleExitCode
+endif
+
+[DosInAnIcon_EdgeFixLocalhost_Enable]
+@echo off
+CheckNetIsolation LoopbackExempt -a -n="Microsoft.MicrosoftEdge_8wekyb3d8bbwe"
+
+[DosInAnICon_EdgeFixLocalhost_Disable]
+@echo off
+CheckNetIsolation LoopbackExempt -d -n="Microsoft.MicrosoftEdge_8wekyb3d8bbwe"
+
+[Sub_GetSleepProperties]
+message "Rufe Einstellungen für Energiesparfunktionen ab..."
+comment "Getting properties for sleep functions from service..."
+Set $DisableSleepFunctions$ = GetProductProperty("disable-sleep-functions", "False")
+
+[Sub_Sleep]
+if ($DisableSleepFunctions$ = "True")
+  ; DosInAnIcon_Powercfg_DisableHibernate
+  ; Sub_HandleExitCode
+  Registry_DisableSleepFunctions
+else
+  ; DosInAnIcon_Powercfg_EnableHibernate
+  ; Sub_HandleExitCode
+  Registry_EnableSleepFunctions
+endif
+
+[DosInAnIcon_Powercfg_DisableHibernate]
+@echo off
+powercfg -h off
+
+[DosInAnIcon_Powercfg_EnableHibernate]
+@echo off
+powercfg -h on
+
+[Registry_DisableSleepFunctions]
+openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Power\PowerSettings\abfc2519-3608-4c2a-94ea-171b0ed546ab]
+set "ACSettingIndex"=REG_DWORD:0
+set "DCSettingIndex"=REG_DWORD:0
+openkey [HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Power]
+set "HibernateEnabled"=REG_DWORD:0
+
+[Registry_EnableSleepFunctions]
+openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Power\PowerSettings\abfc2519-3608-4c2a-94ea-171b0ed546ab]
+set "ACSettingIndex"=REG_DWORD:1
+set "DCSettingIndex"=REG_DWORD:1
+openkey [HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Power]
+set "HibernateEnabled"=REG_DWORD:1
+
+[Sub_GetPrinterProperties]
+message "Rufe Einstellungen für lokalen Drucker ab..."
+comment "Getting properties for local printer from service..."
+Set $SetLocalPrinter$ = GetProductProperty("default-local-printer", "false")
+Set $PrinterName$ = GetProductProperty("local-printer-name", "")
+
+[Sub_Printer]
+if ($SetLocalPrinter$ = "true")
+  message "Richte lokalen Drucker als Standard ein..."
+  comment "Setting up local printer as default..."
+  Files_PreparePrinter
+  PatchTextFile_PrinterBatch "%ProgramFilesSysnativeDir%\stsbl\local-printer.bat"
+  LinkFolder_PrinterBatch
+endif
+
+if ($SetLocalPrinter$ = "false")
+  Sub_RemoveLocalPrinter
+endif
+
+[Files_PreparePrinter]
+CheckTargetPath = "%ProgramFilesSysnativeDir%\stsbl"
+Delete -f "%ProgramFilesSysnativeDir%\stsbl\local-printer.bat"
+
+[PatchTextFile_PrinterBatch]
+AddLine "@echo off"
+AddLine 'RUNDLL32 PRINTUI.DLL,PrintUIEntry /y /n "$PrinterName$"'
+
+[LinkFolder_PrinterBatch]
+set_basefolder common_startup
+set_subfolder ""
+set_link
+  name: Local Printer
+  target: %ProgramFiles64Dir%\stsbl\local-printer.bat
+  parameters:
+  working_dir:
+  icon_file:
+  icon_index:
+end_link
+
+[Sub_PasswordOnResume]
+message "Setzte Einstellungen für Passwort..."
+comment "Setting properties for password..."
+Switch $PasswordOnResume$
+  Case "False"
+    comment "Disabling Password on resume..."
+    Registry_PasswordOnResume_Disabled
+  EndCase
+  Case "True"
+    comment "Enabling Password on resume..."
+    Registry_PasswordOnResume_Enabled
+  EndCase
+  DefaultCase
+    LogWarning "Unknown value of property password-on-resume: " + $PasswordOnResume$
+  EndCase
+EndSwitch
+
+[Sub_PowerButton]
+message "Setzte Einstellungen für Netzschalter..."
+comment "Setting properties for power button..."
+Switch $PowerButtonAction$
+  Case "Unverändert"
+    comment "Changing nothing..."
+  EndCase
+  Case "Nichts unternehmen"
+    comment "Setting powerbutton action to Doing nothing..."
+    Registry_PowerButtonAction_Nothing
+  EndCase
+  Case "Standby"
+    comment "Setting powerbutton action to Standby..."
+    Registry_PowerButtonAction_Standby
+  EndCase
+  Case "Ruhezustand"
+    comment "Setting powerbutton action to Ruhezustand..."
+    Registry_PowerButtonAction_Hibernate
+  EndCase
+  Case "Herunterfahren"
+    comment "Setting powerbutton action to Shutdown..."
+    Registry_PowerButtonAction_Shutdown
+  EndCase
+  DefaultCase
+    LogWarning "Unknown value of property powerbutton-action: " + $PowerButtonAction$
+  EndCase
+EndSwitch
+
+message "Aktualisiere Gruppenrichtlinien..."
+DosInAnIcon_PolicyUpdate
+
+[Registry_SystemSID_Nothing]
+openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Power\PowerSettings\5CA83367-6E45-459F-A27B-476B1D01C936]
+set "DCSettingIndex"=REG_DWORD:0000
+set "ACSettingIndex"=REG_DWORD:0000
+
+[Registry_SystemSID_Standby]
+openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Power\PowerSettings\5CA83367-6E45-459F-A27B-476B1D01C936]
+set "DCSettingIndex"=REG_DWORD:0001
+set "ACSettingIndex"=REG_DWORD:0001
+
+[Registry_SystemSID_Hibernate]
+openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Power\PowerSettings\5CA83367-6E45-459F-A27B-476B1D01C936]
+set "DCSettingIndex"=REG_DWORD:0002
+set "ACSettingIndex"=REG_DWORD:0002
+
+[Registry_SystemSID_Shutdown]
+openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Power\PowerSettings\5CA83367-6E45-459F-A27B-476B1D01C936]
+set "DCSettingIndex"=REG_DWORD:0003
+set "ACSettingIndex"=REG_DWORD:0003
+
+[Sub_GetSystemSIDProperties]
+message "Rufe Einstellungen für Zuklappen des Deckels ab..."
+comment "Getting product properties for SystemSID from service..."
+set $SystemSIDAction$ = getProductProperty("systemsid-action", "")
+
+[Sub_SystemSID]
+if ($SystemSIDAction$ = "Nichts unternehmen")
+  message "Setze Aktion für Zuklappen des Deckels auf Nichts unternehmen..."
+  comment "Setting SystemSID Action to nothing..."
+  Registry_SystemSID_Nothing
+endif
+
+if ($SystemSIDAction$ = "Standby")
+  message "Setze Aktion für Zuklappen des Deckels auf Standby..."
+  comment "Setting SystemSID Action to standby..."
+  Registry_SystemSID_Standby
+endif
+
+if ($SystemSIDAction$ = "Ruhezustand")
+  message "Setze Aktion für Zuklappen des Deckels auf Ruhezustand..."
+  comment "Setting SystemSID Action to hibernate..."
+  Registry_SystemSID_Hibernate
+endif
+
+if ($SystemSIDAction$ = "Herunterfahren")
+  message "Setze Aktion für Zuklappen des Deckels auf Herunterfahren..."
+  comment "Setting SystemSID Action to shutdown..."
+  Registry_SystemSID_Shutdown
+endif
+
+message "Aktualisiere Gruppenrichtlinien..."
+DosInAnIcon_PolicyUpdate
+
+[DosInAnIcon_Powercfg_PowerSaver]
+@echo off
+powercfg -SETACTIVE a1841308-3541-4fab-bc81-f71556f20b4a
+
+[DosInAnIcon_Powercfg_Balanced]
+@echo off
+powercfg -SETACTIVE 381b4222-f694-41f0-9685-ff5bb260df2e
+
+[DosInAnIcon_Powercfg_FullPower]
+@echo off
+powercfg -SETACTIVE 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c
+
+[DosInAnIcon_Firewall_enable]
+@echo off
+netsh advfirewall set allprofiles state on
+
+[DosInAnIcon_Firewall_disable]
+@echo off
+netsh advfirewall set allprofiles state off
+
+[DosInAnIcon_UserProfiles_delete]
+@echo off
+"%ScriptPath%\data\Delprof2.exe" /u $ExcludedProfiles$
+
+[DosInAnIcon_Firewall_ResetRules]
+@echo off
+netsh advfirewall firewall delete rule name="IServ Datei- und Druckerfreigabe"
+netsh advfirewall firewall delete rule name="IServ Ping"
+netsh advfirewall firewall delete rule name="IServ Remotedesktop"
+
+[DosInAnIcon_Firewall_SetRules_TCP139]
+@echo off
+netsh advfirewall firewall add rule name="IServ Datei- und Druckerfreigabe" protocol=TCP dir=in localport=139 $LIPString$ $RIPString$ action=allow
+
+[DosInAnIcon_Firewall_SetRules_TCP445]
+@echo off
+netsh advfirewall firewall add rule name="IServ Datei- und Druckerfreigabe" protocol=TCP dir=in localport=445 $LIPString$ $RIPString$ action=allow
+
+[DosInAnIcon_Firewall_SetRules_UDP137]
+@echo off
+netsh advfirewall firewall add rule name="IServ Datei- und Druckerfreigabe" protocol=UDP dir=in localport=137 $LIPString$ $RIPString$ action=allow
+
+[DosInAnIcon_Firewall_SetRules_UDP138]
+@echo off
+netsh advfirewall firewall add rule name="IServ Datei- und Druckerfreigabe" protocol=UDP dir=in localport=138 $LIPString$ $RIPString$ action=allow
+
+[DosInAnIcon_Firewall_SetRules_ICMPv4]
+@echo off
+netsh advfirewall firewall add rule name="IServ Ping" protocol=Icmpv4 dir=in $LIPString$ $RIPString$ action=allow
+
+[DosInAnIcon_Firewall_SetRules_TCP3389]
+@echo off
+netsh advfirewall firewall add rule name="IServ Remotedesktop" protocol=TCP dir=in localport=3389 $LIPString$ $RIPString$ action=allow
+
+[DosInAnIcon_PolicyUpdate]
+@echo off
+gpupdate /force
+
+[Registry_LockEnergySettings]
+openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Power\PowerSettings]
+set "ActivePowerScheme"="$SchemeGUID$"
+
+[Registry_UnlockEnergySettings]
+openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Power\PowerSettings]
+DeleteVar "ActivePowerScheme"
+
+[Sub_GetPowercfgProperties]
+message "Rufe Einstellungen für Energiesparpläne ab..."
+comment "Getting properties for power settings from service..."
+set $ActiveEnergyScheme$ = getProductProperty("active-energy-scheme", "Ausbalanciert")
+set $LockEnergySettings$ = getProductProperty("lock-energy-settings", "False")
+
+message "Entsperre Energieoptionen..."
+Registry_UnlockEnergySettings
+message "Aktualisiere Gruppenrichtlinien..."
+DosInAnIcon_PolicyUpdate
+
+[Sub_Powercfg]
+if ($ActiveEnergyScheme$ = "Ausbalanciert")
+  message "Aktiviere Energiesparplan Ausbalanciert..."
+  comment "Setting energy scheme to balanced..."
+  DosInAnIcon_Powercfg_Balanced
+  Sub_HandleExitCode
+  set $SchemeGUID$ = "381b4222-f694-41f0-9685-ff5bb260df2e"
+endif
+
+if ($ActiveEnergyScheme$ = "Energiesparmodus")
+  message "Aktiviere Energiesparplan Energiesparmodus..."
+  comment "Setting energy scheme to energy saving..."
+  DosInAnIcon_Powercfg_PowerSaver
+  Sub_HandleExitCode
+  set $SchemeGUID$ = "a1841308-3541-4fab-bc81-f71556f20b4a"
+endif
+
+if ($ActiveEnergyScheme$ = "Höchstleistung")
+  message "Aktiviere Energiesparplan Höchstleistung..."
+  comment "Setting energy scheme to full power..."
+  DosInAnIcon_Powercfg_FullPower
+  Sub_HandleExitCode
+  set $SchemeGUID$ = "8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c"
+endif
+
+if ($LockEnergySettings$ = "True")
+  message "Sperre Energieoptionen..."
+  Registry_LockEnergySettings
+  message "Aktualisiere Gruppenrichtlinien..."
+  DosInAnIcon_PolicyUpdate
+endif
+
+[Sub_Firewall_SetRules]
+DosInAnIcon_Firewall_SetRules_TCP139
+Sub_HandleExitCode
+DosInAnIcon_Firewall_SetRules_TCP445
+Sub_HandleExitCode
+DosInAnIcon_Firewall_SetRules_UDP137
+Sub_HandleExitCode
+DosInAnIcon_Firewall_SetRules_UDP138
+Sub_HandleExitCode
+DosInAnIcon_Firewall_SetRules_ICMPv4
+Sub_HandleExitCode
+DosInAnIcon_Firewall_SetRules_TCP3389
+Sub_HandleExitCode
+
+[Sub_Firewall]
+if ($Firewall$ = "Ja")
+  message "Windows-Firewall wird eingeschaltet..."
+  comment "Enabling Windows Firewall..."
+  DosInAnIcon_Firewall_enable
+endif
+
+if ($FilePrinterSharing$ = "True")
+  message "Aktiviere Datei- und Druckerfreigabe in der Firewall..."
+  comment "Enabling file- and printer sharing..."
+  if not ($FilePrinterSharingLocalIP$ = "")
+    set $LIPString$ = "localip=" + $FilePrinterSharingLocalIP$
+  endif
+  if not ($FilePrinterSharingRemoteIP$ = "")
+    set $RIPString$ = "remoteip=" + $FilePrinterSharingRemoteIP$
+  endif
+  DosInAnIcon_Firewall_ResetRules
+  Sub_Firewall_SetRules 
+endif
+
+if ($FilePrinterSharing$ = "False")
+  message "Deaktiviere Datei- und Druckerfreigabe in der Firewall..."
+  comment "Disabling file- and printer sharing..."
+  DosInAnIcon_Firewall_ResetRules
+endif
+
+if ($Firewall$ = "Nein")
+  message "Windows-Firewall wird ausgeschaltet..."
+  comment "Disabling Windows Firewall..."
+  DosInAnIcon_Firewall_disable
+endif 
+Sub_HandleExitCode
+
+[Sub_GetFirewallProperties]
+; Getting product properties from service
+message "Rufe Einstellungen für die Firewall ab..."
+comment "Getting product properties for firewall from service..."
+set $Firewall$ = GetProductProperty("firewall", "Unverändert") 
+set $FilePrinterSharing$ = GetProductProperty("file-printer-sharing", "True")
+set $FilePrinterSharingLocalIP$ = GetProductProperty("file-printer-sharing-local-ip", "any")
+set $FilePrinterSharingRemoteIP$ = GetProductProperty("file-printer-sharing-remote-ip", "10.0.0.0/8")
+
+[Sub_UserProfiles]
+if ($CleanupProfiles$ = "True")
+  message "Lösche Benutzerprofile..."
+  comment "Deleting User Profiles"
+  comment "Executing %ScriptPath%\data\Delprof2.exe /u " + $ExcludedProfiles$ + "..."
+  DosInAnIcon_UserProfiles_delete
+  Sub_HandleExitCode
+endif 
+
+[Sub_UAC]
+; Enable UAC
+if ($UAC$ = "Ja")
+  message "Benutzerkontensteuerung aktivieren..."
+  comment "Enabling UAC..."
+  Registry_EnableUAC
+  ; Important for reboot
+  Set $UACSettingsChanged$ = "True"
+endif 
+
+; Disable UAC
+if ($UAC$ = "Nein")  
+  message "Benutzerkontensteuerung deaktivieren..."
+  comment "Disabling UAC..."
+  Registry_DisableUAC
+  ; Important for reboot
+  Set $UACSettingsChanged$ = "True"
+endif 
+
+[Sub_UACLevel]
+message "Level der Benutzerkontensteuerung wird gesetzt..."
+if not ($UACLevel$ = "0")
+  Switch $UACLevel$
+    Case "1"
+      message "Setze Level auf 1."
+      comment "Setting UAC Level to 1"
+      Registry_UACLevel_1
+    EndCase
+    Case "2"
+      message "Setze Level auf 2."
+      comment "Setting UAC Level to 2"
+      Registry_UACLevel_2
+    EndCase
+    Case "3"
+      message "Setze Level auf 3."
+      comment "Setting UAC Level to 2"
+      Registry_UACLevel_3
+    EndCase
+    DefaultCause
+      message "Fehler: Level ist unbekannt."
+      LogWarning "Doing nothing. UAC Level is unkown: " + $UACLevel$
+  EndSwitch
+endif 
+
+[Sub_UACUser]
+message "Benutzerkonstensteuerungsoptionen für Standardbenutzer werden gesetzt..."
+if ($UACUser$ = "True")
+  comment "Enabling UAC for standard users..."
+  Registry_UACUser_Enabled
+endif 
+
+if ($UACUser$ = "False")
+  comment "Disabling UAC for standard users..."
+  Registry_UACUser_Disabled
+endif 
+
+[Sub_HandleExitCode]
+; check return code
+Set $ExitCode$ = GetLastExitCode
+comment "GetLastExitCode: " + $ExitCode$
+if not ($ExitCode$ = "0")
+  LogError "Fatal: batch command returned exit code: " + $ExitCode$
+  IsFatalError
+endif 
+
+[Sub_GetUACProperties]
+; Getting product properties from service
+message "Rufe Einstellungen für die Benutzerkontensteuerung ab..."
+comment "Getting product properties for UAC from service..."
+Set $UAC$ = GetProductProperty("uac", "Unverändert")
+Set $UACLevel$ = GetProductProperty("uac-level", "0")
+Set $UACUser$ = GetProductProperty("uac-user", "True")
+
+[Sub_GetUserProfileProperties]
+; Getting product properties from service
+message "Rufe Einstellungen für die Benutzerprofilbereinigung ab..."
+comment "Getting product properties for User Profile cleanup from service..."
+Set $CleanupProfiles$ = GetProductProperty("cleanup-profiles", "True")
+Set $ExcludedProfiles$ = GetProductProperty("excluded-profiles", "/ed:LocalAdmin")
+
+[Sub_GetPasswordOnResumeProperties]
+; Getting product properties from service
+message "Rufe Einstellungen für Passwort ab..."
+comment "Getting product properties for password from service..."
+Set $PasswordOnResume$ = GetProductProperty("password-on-resume", "false")
+
+[Sub_GetPowerButtonProperties]
+; Getting product properties from service
+message "Rufe Einstellungen für Netzschalter  ab..."
+comment "Getting product properties for powerbutton from service..."
+Set $PowerButtonAction$ = GetProductProperty("powerbutton-action", "Herunterfahren")
+
+[Sub_DefVars]
+message "Setzte Variablen..."
+; Define variables for product properties
+DefVar $UAC$
+DefVar $UACLevel$
+DefVar $UACSettingsChanged$
+DefVar $UACUser$
+DefVar $Firewall$
+DefVar $CleanupProfiles$
+DefVar $ExcludedProfiles$
+DefVar $FilePrinterSharing$
+DefVar $FilePrinterSharingLocalIP$
+DefVar $FilePrinterSharingRemoteIP$
+DefVar $LIPString$
+DefVar $RIPString$
+DefVar $ActiveEnergyScheme$
+DefVar $LockEnergySettings$
+DefVar $SchemeGUID$
+DefVar $SystemSIDAction$
+DefVar $PasswordOnResume$
+DefVar $PowerButtonAction$
+DefVar $SetLocalPrinter$
+DefVar $PrinterName$
+DefVar $DisableSleepFunctions$
+DefVar $FixEdgeLocalhost$
+DefVar $DisableAgent$
+DefVar $DisableAUUpdate$
+
+[Sub_WinReboot]
+if ($UACSettingsChanged$ = "True")
+  message "Fordere Neustart von Windows an..."
+  comment "Requesting reboot of Windows..."
+  ExitWindows /Reboot
+endif 
+  
+[Registry_EnableUAC]
+openkey [HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\policies\system]
+set "EnableLUA" = REG_DWORD:0001
+
+[Registry_DisableUAC]
+openkey [HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\policies\system]
+set "EnableLUA" = REG_DWORD:0000
+
+[Registry_UACLevel_1]
+openkey [HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\policies\system]
+set "ConsentPromptBehaviorAdmin" = REG_DWORD:0000
+
+[Registry_UACLevel_2]
+openkey [HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\policies\system]
+set "ConsentPromptBehaviorAdmin" = REG_DWORD:0005
+
+[Registry_UACLevel_3]
+openkey [HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\policies\system]
+set "ConsentPromptBehaviorAdmin" = REG_DWORD:0001
+
+[Registry_UACUser_Enabled]
+openkey [HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\policies\system]
+set "ConsentPromptBehaviorUser" = REG_DWORD:0001
+
+[Registry_UACUser_Disabled]
+openkey [HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\policies\system]
+set "ConsentPromptBehaviorUser" = REG_DWORD:0000
+
+[Registry_PowerButtonAction_Nothing]
+openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Power\PowerSettings\7648EFA3-DD9C-4E3E-B566-50F929386280]
+set "ACSettingIndex" = REG_DWORD:0000
+set "DCSettingIndex" = REG_DWORD:0000
+
+[Registry_PowerButtonAction_Standby]
+openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Power\PowerSettings\7648EFA3-DD9C-4E3E-B566-50F929386280]
+set "ACSettingIndex" = REG_DWORD:0001
+set "DCSettingIndex" = REG_DWORD:0001
+
+[Registry_PowerButtonAction_Hibernate]
+openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Power\PowerSettings\7648EFA3-DD9C-4E3E-B566-50F929386280]
+set "ACSettingIndex" = REG_DWORD:0002
+set "ACSettingIndex" = REG_DWORD:0002
+
+[Registry_PowerButtonAction_Shutdown]
+openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Power\PowerSettings\7648EFA3-DD9C-4E3E-B566-50F929386280]
+set "ACSettingIndex" = REG_DWORD:0003
+set "ACSettingIndex" = REG_DWORD:0003
+
+[Registry_PasswordOnResume_Enabled]
+openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Power\PowerSettings\0e796bdb-100d-47d6-a2d5-f7d2daa51f51]
+set "ACSettingIndex" = REG_DWORD:0001
+set "DCSettingIndex" = REG_DWORD:0001
+
+[Registry_PasswordOnResume_Disabled]
+openkey [HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Power\PowerSettings\0e796bdb-100d-47d6-a2d5-f7d2daa51f51]
+set "ACSettingIndex" = REG_DWORD:0000
+

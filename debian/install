@@ -1,0 +1,4 @@
+data/* srv/deploy/install/change-windows-settings/data/
+winst/* srv/deploy/install/change-windows-settings/
+debian/changelog srv/deploy/install/change-windows-settings/
+debian/changelog DEBIAN/
