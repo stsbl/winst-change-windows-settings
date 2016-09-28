@@ -1,2 +1,5 @@
 debian/winst-change-windows-settings
 debian/winst-change-windows-settings.debhelper.log
+debian/winst-change-windows-settings.substvars
+debian/files
+debian/debhelper-build-stamp
