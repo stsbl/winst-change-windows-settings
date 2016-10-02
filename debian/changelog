@@ -1,3 +1,9 @@
+winst-change-windows-settings (0.3-3.0) experimental; urgency=low
+
+  * Updated help links. 
+
+ -- Stadtteilschule Blankenese <repository@stsbl.de>  Mon, 03 Oct 2016 00:12:04 +0200
+
 winst-change-windows-settings (0.3-2.9) experimental; urgency=low
 
   * Internal: Migration to new Source Format.
