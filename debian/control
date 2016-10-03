@@ -1,6 +1,6 @@
 Source: winst-change-windows-settings
-Section: unknown
-Priority: optional
+Section: misc
+Priority: extra
 Maintainer: Stadtteilschule Blankenese <repository@stsbl.de>
 Build-Depends: debhelper (>=9)
 Standards-Version: 3.9.6
