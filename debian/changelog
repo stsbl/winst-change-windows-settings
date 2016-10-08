@@ -1,3 +1,9 @@
+winst-change-windows-settings (0.3-3.1) experimental; urgency=low
+
+  * Updated package tags. 
+
+ -- Stadtteilschule Blankenese <repository@stsbl.de>  Fri, 07 Oct 2016 02:50:14 +0200
+
 winst-change-windows-settings (0.3-3.0) experimental; urgency=low
 
   * Updated help links. 
