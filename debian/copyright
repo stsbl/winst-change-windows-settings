@@ -3,15 +3,15 @@ Upstream-Name: winst-change-windows-settings
 Source: <https://repository.stsbl.de/doc/tools/winst-change-windows-settings.html>
 
 Files: *
-Copyright: 2016 Felix Jacobi <felix.jacobi@stsbl.de>
+Copyright: 2017 Felix Jacobi <felix.jacobi@stsbl.de>
 License: GPL-3.0+
 
 Files: debian/*
-Copyright: 2016 Stadtteilschule Blankenese <repository@stsbl.de>
+Copyright: 2017 Stadtteilschule Blankenese <repository@stsbl.de>
 License: GPL-3.0+
 
 Files: data/DelProf2.exe
-Copyright: 2016 Helge Klein 
+Copyright: 2017 Helge Klein 
 License: DelProf2-EULA
 
 License: GPL-3.0+
