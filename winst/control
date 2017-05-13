@@ -4,9 +4,8 @@ id: change-windows-settings
 name: Windows: Einstellungen ändern
 description: Dieses Paket kann auf Windows-Computer angewandt werden, um Systemeinstellungen, wie die Benutzerkontensteuerung und die Firewall zu konfigurieren. Eine detaillierte Dokumentation aller Einstellungen befindet sich unter https://it.stsbl.de/documentation/tools/winst-change-windows-settings
 advice: Nachdem die Einstellungen auf Windows-Computer angewandt wurden, das Paket aber nicht mehr in der Liste der installierten Software erscheinen soll, kann es einfach durch Ignorieren entfernt werden. Die Option zum Löschen der Benutzerprofile darf nur von Bildungs- und Non-Profit-Organisationen eingesetzt werden.
-version: 0.3
-packageVersion: 3.0
-priority: 0
+version: 1.0
+packageVersion: 1.0
 setupScript: install.ins
 uninstallScript: remove.ins
 
@@ -14,7 +13,7 @@ uninstallScript: remove.ins
 type: unicode
 name: uac
 description: Die Benutzerkontensteuerung aktivieren?
-editable: False
+editable: false
 values: ["Ja", "Nein", "Unverändert"]
 default: ["Unverändert"]
 
@@ -22,7 +21,7 @@ default: ["Unverändert"]
 type: unicode
 name: uac-level
 description: Level der Benutzerkontensteuerung für Administratoren
-editable: False
+editable: false
 values: ["0", "1", "2", "3"]
 default: ["0"]
 
@@ -30,14 +29,14 @@ default: ["0"]
 type: bool
 name: uac-user
 description: Können Benutzer die UAC verwenden?
-editable: False
+editable: false
 default: True
 
 [ProductProperty]
 type: unicode
 name: firewall
 description: Die Firewall aktivieren?
-editable: False
+editable: false
 values: ["Ja", "Nein", "Unverändert"]
 default: ["Unverändert"]
 
@@ -45,25 +44,21 @@ default: ["Unverändert"]
 type: bool
 name: file-printer-sharing
 description: Ausnahmeregeln für IServ hinzufügen?
-editable: False
+editable: false
 default: True
 
 [ProductProperty]
-type: unicode
 name: file-printer-sharing-local-ip
 description: Lokale IP-Adressen für Ausnahmeregeln
-editable: True
 
 [ProductProperty]
-type: unicode
 name: file-printer-sharing-remote-ip
 description: Remote IP-Adressen für Ausnahmeregeln
-editable: True
 
 [ProductProperty]
 type: unicode
 name: active-energy-scheme
-editable: False
+editable: false
 values: ["Energiesparmodus", "Ausbalanciert", "Höchstleistung"]
 default: ["Ausbalanciert"]
 description: Aktiver Energiesparplan
@@ -71,7 +66,6 @@ description: Aktiver Energiesparplan
 [ProductProperty]
 type: bool
 name: lock-energy-settings
-editable: False
 default: False
 description: Ändern der Energieoptionen sperren?
 
@@ -79,7 +73,7 @@ description: Ändern der Energieoptionen sperren?
 type: unicode
 name: systemsid-action
 description: Aktion bei Zuklappen des Deckels
-editable: False
+editable: false
 values: ["Unverändert", "Nichts unternehmen", "Standby", "Ruhezustand", "Herunterfahren"]
 default: ["Unverändert"]
 
@@ -87,7 +81,6 @@ default: ["Unverändert"]
 type: bool
 name: password-on-resume
 description: Passwort beim Aufwecken des Computers anfordern?
-editable: false
 default: true
 
 [ProductProperty]
@@ -102,8 +95,8 @@ editable: false
 type: bool
 name: disable-sleep-functions
 description: Sämtliche Energiesparfunktionen deaktivieren?
-editable: False
-default: False
+editable: false
+default: false
 
 [ProductProperty]
 type: bool
@@ -113,7 +106,6 @@ editable: false
 default: false
 
 [ProductProperty]
-type: unicode
 name: local-printer-name
 description: Name des lokalen Druckers
 
@@ -121,7 +113,7 @@ description: Name des lokalen Druckers
 type: bool
 name: cleanup-profiles
 description: Alle zwischengespeicherten Roamingprofile auf dem Computer löschen?
-editable: False
+editable: false
 default: False
 
 [ProductProperty]

@@ -1,3 +1,14 @@
+winst-change-windows-settings (1.0-1.0) experimental; urgency=medium
+
+  * Adjusted control file for IServ 3 Deploy.
+  * Cleaned up version number scheme.
+
+  iserv: Die Einstellungen des Paketes können nun über die Oberfläche der
+    IServ 3-Softwareverteilung geändert werden, Freieingabefelder werden nun
+    nicht mehr als Auswahlfeld angezeigt. 
+
+ -- Stadtteilschule Blankenese <repository@stsbl.de>  Sat, 13 May 2017 05:54:45 +0200
+
 winst-change-windows-settings (0.3-3.1) experimental; urgency=low
 
   * Updated package tags. 

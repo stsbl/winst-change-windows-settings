@@ -1,6 +1,0 @@
-#!/bin/sh
-
-mkdir -p /srv/deploy/install/change-windows-settings/data/
-
-cp -rv data/* /srv/deploy/install/change-windows-settings/data/
-cp -rv winst/* /srv/deploy/install/change-windows-settings/
