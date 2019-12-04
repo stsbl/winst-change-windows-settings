@@ -7,7 +7,7 @@ Standards-Version: 4.1.3
 
 Package: winst-change-windows-settings
 Architecture: all
-Description: Windows: Einstellungen ändern
+Description: winst Windows: Einstellungen ändern
  Dieses Paket integriert sich in die IServ Softwareverteilung und kann auf Windows-Computer angewandt werden,
  um Systemeinstellungen, wie die Benutzerkontensteuerung und die Firewall zu konfigurieren.
  Eine detaillierte Dokumentation aller Einstellungen befindet sich unter
