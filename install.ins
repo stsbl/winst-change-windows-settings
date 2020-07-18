@@ -12,6 +12,7 @@ if (CompareDotSeparatedNumbers(GetMsVersionInfo, "<", "6.1"))
   isFatalError
 endif
 Sub_DefVars
+Sub_GetIServHostname
 Sub_GetUACProperties
 Sub_UAC
 Sub_UACLevel
@@ -41,6 +42,17 @@ Sub_SetWUStatus
 Sub_GetAUUpdateProperties
 Sub_SetAUStatus
 Sub_WinReboot
+
+[Sub_GetIServHostname]
+message "Ermittele IServ-Hostnamen..."
+comment "Get IServ hostname"
+Set $IServHostname$ = Lower(Trim(TakeString(0, GetReturnListFromSection("opsiservicecall_GetHostname"))))
+
+[opsiservicecall_GetHostname]
+"method":"iserv_cfg"
+"params":[
+  "Hostname"
+]
 
 [Sub_GetAUUpdateProperties]
 message "Rufe Einstellungen für automatisches Windows Update ab..."
@@ -327,30 +339,37 @@ netsh advfirewall set allprofiles state off
 netsh advfirewall firewall delete rule name="IServ Datei- und Druckerfreigabe"
 netsh advfirewall firewall delete rule name="IServ Ping"
 netsh advfirewall firewall delete rule name="IServ Remotedesktop"
+netsh advfirewall firewall delete rule name="IServ Datei- und Druckerfreigabe (Windows: Einstellungen ändern)"
+netsh advfirewall firewall delete rule name="IServ Ping (Windows: Einstellungen ändern)"
+netsh advfirewall firewall delete rule name="IServ Remotedesktop (Windows: Einstellungen ändern)"
 
 [DosInAnIcon_Firewall_SetRules_TCP139]
 @echo off
-netsh advfirewall firewall add rule name="IServ Datei- und Druckerfreigabe" protocol=TCP dir=in localport=139 $LIPString$ $RIPString$ action=allow
+netsh advfirewall firewall add rule name="IServ Datei- und Druckerfreigabe (Windows: Einstellungen ändern)" protocol=TCP dir=in localport=139 $LIPString$ $RIPString$ action=allow
 
 [DosInAnIcon_Firewall_SetRules_TCP445]
 @echo off
-netsh advfirewall firewall add rule name="IServ Datei- und Druckerfreigabe" protocol=TCP dir=in localport=445 $LIPString$ $RIPString$ action=allow
+netsh advfirewall firewall add rule name="IServ Datei- und Druckerfreigabe (Windows: Einstellungen ändern)" protocol=TCP dir=in localport=445 $LIPString$ $RIPString$ action=allow
 
 [DosInAnIcon_Firewall_SetRules_UDP137]
 @echo off
-netsh advfirewall firewall add rule name="IServ Datei- und Druckerfreigabe" protocol=UDP dir=in localport=137 $LIPString$ $RIPString$ action=allow
+netsh advfirewall firewall add rule name="IServ Datei- und Druckerfreigabe (Windows: Einstellungen ändern)" protocol=UDP dir=in localport=137 $LIPString$ $RIPString$ action=allow
 
 [DosInAnIcon_Firewall_SetRules_UDP138]
 @echo off
-netsh advfirewall firewall add rule name="IServ Datei- und Druckerfreigabe" protocol=UDP dir=in localport=138 $LIPString$ $RIPString$ action=allow
+netsh advfirewall firewall add rule name="IServ Datei- und Druckerfreigabe (Windows: Einstellungen ändern)" protocol=UDP dir=in localport=138 $LIPString$ $RIPString$ action=allow
 
 [DosInAnIcon_Firewall_SetRules_ICMPv4]
 @echo off
-netsh advfirewall firewall add rule name="IServ Ping" protocol=Icmpv4 dir=in $LIPString$ $RIPString$ action=allow
+netsh advfirewall firewall add rule name="IServ Ping (Windows: Einstellungen ändern)" protocol=Icmpv4 dir=in $LIPString$ $RIPString$ action=allow
 
 [DosInAnIcon_Firewall_SetRules_TCP3389]
 @echo off
-netsh advfirewall firewall add rule name="IServ Remotedesktop" protocol=TCP dir=in localport=3389 $LIPString$ $RIPString$ action=allow
+netsh advfirewall firewall add rule name="IServ Remotedesktop (Windows: Einstellungen ändern)" protocol=TCP dir=in localport=3389 $LIPString$ $RIPString$ action=allow
+
+[DosInAnIconf_Firewall_ImportIServRules]
+@echo off
+call \\$IServHostname$\netlogon\firewall.bat
 
 [DosInAnIcon_PolicyUpdate]
 @echo off
@@ -419,6 +438,8 @@ Sub_HandleExitCode
 DosInAnIcon_Firewall_SetRules_ICMPv4
 Sub_HandleExitCode
 DosInAnIcon_Firewall_SetRules_TCP3389
+Sub_HandleExitCode
+DosInAnIcon_Firewall_ImportIServRules
 Sub_HandleExitCode
 
 [Sub_Firewall]
@@ -591,6 +612,9 @@ DefVar $DisableSleepFunctions$
 DefVar $FixEdgeLocalhost$
 DefVar $DisableAgent$
 DefVar $DisableAUUpdate$
+
+; Variables for internal settings
+DefVar $IServHostname$
 
 [Sub_WinReboot]
 if ($UACSettingsChanged$ = "True")

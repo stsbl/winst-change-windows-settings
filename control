@@ -5,7 +5,7 @@ name: Windows: Einstellungen ändern
 description: Dieses Paket kann auf Windows-Computer angewandt werden, um Systemeinstellungen, wie die Benutzerkontensteuerung und die Firewall zu konfigurieren. Eine detaillierte Dokumentation aller Einstellungen befindet sich unter https://it.stsbl.de/documentation/tools/winst-change-windows-settings
 advice: Nachdem die Einstellungen auf Windows-Computer angewandt wurden, das Paket aber nicht mehr in der Liste der installierten Software erscheinen soll, kann es einfach durch Ignorieren entfernt werden. Die Option zum Löschen der Benutzerprofile darf nur von Bildungs- und Non-Profit-Organisationen eingesetzt werden.
 version: 1.0
-packageVersion: 1.0
+packageVersion: 2.0
 setupScript: install.ins
 uninstallScript: remove.ins
 
