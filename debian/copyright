@@ -2,15 +2,15 @@ Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: winst-change-windows-settings
 
 Files: *
-Copyright: 2017 Felix Jacobi <felix.jacobi@stsbl.de>
+Copyright: 2020 Felix Jacobi <felix.jacobi@stsbl.de>
 License: MIT
 
 Files: debian/*
-Copyright: 2017 Stadtteilschule Blankenese <repository@stsbl.de>
+Copyright: 2020 Stadtteilschule Blankenese <repository@stsbl.de>
 License: MIT
 
 Files: data/DelProf2.exe
-Copyright: 2017 Helge Klein 
+Copyright: 2020 Helge Klein 
 License: DelProf2-EULA
 
 License: MIT
