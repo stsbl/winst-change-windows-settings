@@ -1,3 +1,10 @@
+winst-change-windows-settings (1.0-2.0) experimental; urgency=medium
+
+  * Converted package to new structure
+  * Fixed clash of firewall properties with IServ's firewall.bat
+
+ -- Felix Jacobi <Felix@jacobi-hamburg.net>  Sat, 18 Jul 2020 08:54:33 +0200
+
 winst-change-windows-settings (1.0-1.0) experimental; urgency=medium
 
   * Adjusted control file for IServ 3 Deploy.
@@ -57,7 +64,7 @@ winst-change-windows-settings (0.3-2.5) experimental; urgency=low
   * Fixed broken Windows version check.
 
   iserv: Ein Fehler beim Prüfen der Windows-Version, der irrtümlich neuere Windows-Versionen als 7 als zu alt einstufte, wurde behoben.
- 
+
  -- Stadtteilschule Blankenese <repository@stsbl.de>  Wed, 27 Jan 2016 19:53:03 +0100
 
 winst-change-windows-settings (0.3-2.4) testing; urgency=low
