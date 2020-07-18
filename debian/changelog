@@ -3,7 +3,7 @@ winst-change-windows-settings (1.0-2.0) experimental; urgency=medium
   * Converted package to new structure
   * Fixed clash of firewall properties with IServ's firewall.bat
 
- -- Felix Jacobi <Felix@jacobi-hamburg.net>  Sat, 18 Jul 2020 08:54:33 +0200
+ -- Felix Jacobi <Felix@jacobi-hamburg.net>  Sat, 18 Jul 2020 08:56:31 +0200
 
 winst-change-windows-settings (1.0-1.0) experimental; urgency=medium
 
