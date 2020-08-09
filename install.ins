@@ -367,7 +367,7 @@ netsh advfirewall firewall add rule name="IServ Ping (Windows: Einstellungen än
 @echo off
 netsh advfirewall firewall add rule name="IServ Remotedesktop (Windows: Einstellungen ändern)" protocol=TCP dir=in localport=3389 $LIPString$ $RIPString$ action=allow
 
-[DosInAnIconf_Firewall_ImportIServRules]
+[DosInAnIcon_Firewall_ImportIServRules]
 @echo off
 call \\$IServHostname$\netlogon\firewall.bat
 
