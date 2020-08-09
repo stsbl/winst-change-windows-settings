@@ -1,3 +1,9 @@
+winst-change-windows-settings (1.0-3.0) experimental; urgency=medium
+
+  * Fixed importing IServ firewall rules
+
+ -- Felix Jacobi <Felix@jacobi-hamburg.net>  Sun, 09 Aug 2020 14:47:51 +0200
+
 winst-change-windows-settings (1.0-2.0) experimental; urgency=medium
 
   * Converted package to new structure
