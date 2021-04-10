@@ -2,11 +2,13 @@ Source: winst-change-windows-settings
 Section: misc
 Priority: optional
 Maintainer: Stadtteilschule Blankenese <repository@stsbl.de>
-Build-Depends: debhelper (>= 10)
+Build-Depends: debhelper-compat (= 13),
+               dh-sequence-iserv,
+               dh-sequence-iserv-winst,
+               dh-sequence-stsbl
 Standards-Version: 4.5.0
 
 Package: winst-change-windows-settings
 Architecture: all
 Description: ${iserv:winst:Description}
 Tag: suite::iserv:deploy, role::package
- 

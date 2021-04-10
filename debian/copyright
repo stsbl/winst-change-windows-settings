@@ -2,15 +2,15 @@ Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: winst-change-windows-settings
 
 Files: *
-Copyright: 2020 Felix Jacobi <felix.jacobi@stsbl.de>
+Copyright: 2021 Felix Jacobi <felix.jacobi@stsbl.de>
 License: MIT
 
 Files: debian/*
-Copyright: 2020 Stadtteilschule Blankenese <repository@stsbl.de>
+Copyright: 2021 Stadtteilschule Blankenese <repository@stsbl.de>
 License: MIT
 
 Files: data/DelProf2.exe
-Copyright: 2020 Helge Klein 
+Copyright: 2021 Helge Klein
 License: DelProf2-EULA
 
 License: MIT
@@ -28,8 +28,8 @@ License: MIT
  OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
  MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
  IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
- CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, 
- TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE 
+ CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
  SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 License: DelProf2-EULA
@@ -37,12 +37,12 @@ License: DelProf2-EULA
  .
  * private use
  * non-profit organization
- * educational organization such as schools and universities 
- .                        
+ * educational organization such as schools and universities
+ .
  Delprof2 may only be used free of charge by all other, especially
  commercial, organizations, if a representative authorized to do so sends
  an e-mail with the following text to info@helgeklein.com: “We authorize vast
  limits GmbH to publicly display the name and logo of our company FILL IN
  NAME HERE in vast limits GmbH’s marketing materials.”
- .            
+ .
  Otherwise a commercial license must be purchased.
