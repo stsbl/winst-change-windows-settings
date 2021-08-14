@@ -1,3 +1,11 @@
+winst-change-windows-settings (1.0-4.0) experimental; urgency=medium
+
+  * Moved to iservinstall and updated copyright
+  * Added firewall exception for ICMPv6, fixed typo in uninstall script
+  * prepared control for release 1.0-4.0
+
+ -- Felix Jacobi <Felix@jacobi-hamburg.net>  Sat, 14 Aug 2021 23:49:14 +0200
+
 winst-change-windows-settings (1.0-3.0) experimental; urgency=medium
 
   * Fixed importing IServ firewall rules
